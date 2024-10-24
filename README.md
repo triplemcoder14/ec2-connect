@@ -1,1 +1,1 @@
-# ec2-connect
+# Ec2easyConnect
