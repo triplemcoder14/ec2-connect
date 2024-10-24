@@ -30,6 +30,10 @@ func main() {
 		Filters: filters,
 	}
 
+	// cmd.Stdin = os.Stdin
+	// cmd.Stderr = os.Stderr
+	// cmd.Stdout = os.Stdout
+
 	result, err := svc.DescribeInstances(context.TODO(), input)
 	if err != nil {
 		log.Fatalf("failed to describe instances, %v", err)
