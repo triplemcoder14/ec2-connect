@@ -22,19 +22,19 @@ const defaultUser = "ubuntu"
 const defaultKeyPath = "~/.ssh/id_rsa"
 
 func main() {
-	// Command-line flags
+	// using  flags for the cmd
 	userPtr := flag.String("user", defaultUser, "SSH user for login")
 	directoryPtr := flag.String("directory", defaultKeyPath, "Directory where SSH keys are stored")
 	regionPtr := flag.String("region", "us-east-2", "AWS region to use")
 	flag.Parse()
 
-	// Load the AWS config
+	// load the aws config
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(*regionPtr))
 	if err != nil {
 		log.Fatalf("unable to load SDK config, %v", err)
 	}
 
-	// Set the region if not provided via flags
+	// set region if not provided via flags
 	if *regionPtr == "" {
 		*regionPtr = selectRegion()
 	}
@@ -68,7 +68,7 @@ func main() {
 		return
 	}
 
-	// Display available instances
+	// display available instances
 	for _, inst := range instances {
 		tagName := helpers.GetTagName(&inst)
 		publicIP := ""
@@ -98,8 +98,8 @@ func main() {
 		log.Fatalf("Invalid Instance ID: %s. Please try again.", selectedInstanceID)
 	}
 
-	// SSH connection logic
-	keyPath := expandHomeDir(*directoryPtr) // Expand to home directory
+	// ssh connection logic
+	keyPath := expandHomeDir(*directoryPtr) // expantion to home directory
 
 	key, err := os.ReadFile(keyPath)
 	if err != nil {
@@ -111,7 +111,7 @@ func main() {
 		log.Fatalf("unable to parse private key: %v", err)
 	}
 
-	address := fmt.Sprintf("%s:22", selectedPublicIP) // Use public IP for SSH connection
+	address := fmt.Sprintf("%s:22", selectedPublicIP) // using public ip for ssh connection
 
 	sshConfig := &ssh.ClientConfig{
 		User: *userPtr,
@@ -130,15 +130,15 @@ func main() {
 
 	fmt.Println("Connected successfully!")
 
-	// Now you can start a new session
+	// now you can start a new session
 	session, err := client.NewSession()
 	if err != nil {
 		log.Fatalf("failed to create session: %v", err)
 	}
 	defer session.Close()
 
-	// Example: Run a command on the remote instance
-	output, err := session.Output("whoami") // Change the command as needed
+	//  run a command on the remote instance
+	output, err := session.Output("whoami") // change the command as needed
 	if err != nil {
 		log.Fatalf("failed to run command: %v", err)
 	}
@@ -146,7 +146,7 @@ func main() {
 	fmt.Printf("Output: %s\n", output)
 }
 
-// Example function to select a region using fzf
+// function to select a region using fzf
 func selectRegion() string {
 	cmd := exec.Command("fzf", "--header", "Select AWS Region:")
 	cmd.Stdin = nil
@@ -157,10 +157,10 @@ func selectRegion() string {
 	return string(output)
 }
 
-// Helper function to expand the home directory
+// helper function to expand the home directory
 func expandHomeDir(path string) string {
 	if home := os.Getenv("HOME"); home != "" {
-		path = filepath.Join(home, path[2:]) // Strip off the ~ and join with home dir
+		path = filepath.Join(home, path[2:]) // strip off the ~ and join with home dir
 	}
 	return path
 }
