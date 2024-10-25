@@ -8,7 +8,8 @@ A cmd tool that simplifies connecting to Amazon EC2 instances via SSH. It utiliz
 - Set Up AWS Credentials: Follow the instructions to set up your AWS credentials [here](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html).
 
   ### Build from Source
-To install the latest version, run:
+  
+To install the latest version of EC2-Connect, you can either download the precompiled [binaries](https://github.com/triplemcoder14/ec2-connect/releases/tag/v1.0.0)  or build it from source: run
 
 ```
  go install github.com/triplemcoder14/ec2-connect@latest
@@ -21,7 +22,7 @@ To use the EC2 Connect, simply run the ec2-connect command and follow the prompt
 ### Command Syntax
 
 ```
-ec2-ssh [OPTIONS]
+ec2-connect [OPTIONS]
 ```
 ### Options
 
@@ -34,7 +35,7 @@ ec2-ssh [OPTIONS]
   To connect to an EC2 instance using the ``ec2-user``, SSH keys stored in ``/home/ubuntu/keys``, and targeting the ``us-west-2 region``, you can use:
 
 ```
-  ec2-ssh -user ec2-user -directory /home/ubuntu/keys -region us-west-2
+  ec2-connect -user ec2-user -directory /home/ubuntu/keys -region us-west-2
 ```
 
 ### License
