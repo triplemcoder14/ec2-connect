@@ -1,6 +1,6 @@
 # EC2 Connector
 
-A cmd tool that simplifies connecting to Amazon EC2 instances via SSH. It utilizes [fzf](https://github.com/junegunn/fzf) to help you select the instance you want to connect to and offers several configurable options, including the SSH user, the region to search for instances, and the directory where your SSH keys are stored.
+A command-line tool that simplifies connecting to Amazon EC2 instances via SSH. It utilizes [fzf](https://github.com/junegunn/fzf) to help you select the instance you want to connect to and offers several configurable options, including the SSH user, the region to search for instances, and the directory where your SSH keys are stored.
 
 ### Prerequisites
 
