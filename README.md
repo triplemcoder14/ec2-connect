@@ -4,7 +4,7 @@ A command-line tool that simplifies connecting to Amazon EC2 instances via SSH. 
 
 ### Prerequisites
 
-- Install FZF: Make sure you have ```fzf``` installed on your system.
+- Install [FZF](https://github.com/junegunn/fzf): Make sure you have ```fzf``` installed on your system.
 - Set Up AWS Credentials: Follow the instructions to set up your AWS credentials [here](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html).
 
   ### Build from Source
