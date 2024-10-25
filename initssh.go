@@ -2,24 +2,43 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"path/filepath"
 
 	"golang.org/x/crypto/ssh"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/ec2" // Import the EC2 service
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2Types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/triplemcoder14/ec2-connect/helpers"
 )
 
+const defaultUser = "ubuntu"
+const defaultKeyPath = "~/.ssh/id_rsa"
+
 func main() {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-west-2"))
+	// Command-line flags
+	userPtr := flag.String("user", defaultUser, "SSH user for login")
+	directoryPtr := flag.String("directory", defaultKeyPath, "Directory where SSH keys are stored")
+	regionPtr := flag.String("region", "us-east-2", "AWS region to use")
+	flag.Parse()
+
+	// Load the AWS config
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(*regionPtr))
 	if err != nil {
 		log.Fatalf("unable to load SDK config, %v", err)
 	}
+
+	// Set the region if not provided via flags
+	if *regionPtr == "" {
+		*regionPtr = selectRegion()
+	}
+	cfg.Region = *regionPtr
 
 	svc := ec2.NewFromConfig(cfg)
 
@@ -39,35 +58,48 @@ func main() {
 		log.Fatalf("failed to describe instances, %v", err)
 	}
 
-	var instanceIDs []string
+	var instances []ec2Types.Instance
 	for _, reservation := range result.Reservations {
-		for _, inst := range reservation.Instances {
-			if inst.InstanceId == nil {
-				continue
-			}
-			tagName := helpers.GetTagName(&inst)
-			instanceID := *inst.InstanceId
-			instanceIDs = append(instanceIDs, instanceID)
-			log.Printf("Instance ID: %s, Name: %s", instanceID, tagName)
-		}
+		instances = append(instances, reservation.Instances...)
 	}
 
-	if len(instanceIDs) == 0 {
+	if len(instances) == 0 {
 		log.Println("No running instances found.")
 		return
+	}
+
+	// Display available instances
+	for _, inst := range instances {
+		tagName := helpers.GetTagName(&inst)
+		publicIP := ""
+		if inst.PublicIpAddress != nil {
+			publicIP = *inst.PublicIpAddress
+		}
+		log.Printf("Instance ID: %s, Name: %s, Public IP: %s", *inst.InstanceId, tagName, publicIP)
 	}
 
 	var selectedInstanceID string
 	fmt.Print("Enter the Instance ID to connect: ")
 	fmt.Scanln(&selectedInstanceID)
 
-	if !helpers.Contains(instanceIDs, selectedInstanceID) {
+	var selectedPublicIP string
+	for _, inst := range instances {
+		if *inst.InstanceId == selectedInstanceID {
+			if inst.PublicIpAddress != nil {
+				selectedPublicIP = *inst.PublicIpAddress
+			} else {
+				log.Fatalf("Instance %s does not have a public IP address.", selectedInstanceID)
+			}
+			break
+		}
+	}
+
+	if selectedPublicIP == "" {
 		log.Fatalf("Invalid Instance ID: %s. Please try again.", selectedInstanceID)
 	}
 
 	// SSH connection logic
-	user := "ubuntu"                   // Change this if you're using a different user
-	keyPath := "/path/to/your/key.pem" // Specify the path to your SSH key
+	keyPath := expandHomeDir(*directoryPtr) // Expand to home directory
 
 	key, err := os.ReadFile(keyPath)
 	if err != nil {
@@ -79,14 +111,14 @@ func main() {
 		log.Fatalf("unable to parse private key: %v", err)
 	}
 
-	address := fmt.Sprintf("%s:22", selectedInstanceID) // Replace with the public DNS if needed
+	address := fmt.Sprintf("%s:22", selectedPublicIP) // Use public IP for SSH connection
 
 	sshConfig := &ssh.ClientConfig{
-		User: user,
+		User: *userPtr,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // WARNING: This is insecure; use a proper host key verification in production.
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	fmt.Printf("Connecting to instance %s...\n", selectedInstanceID)
@@ -114,56 +146,21 @@ func main() {
 	fmt.Printf("Output: %s\n", output)
 }
 
+// Example function to select a region using fzf
+func selectRegion() string {
+	cmd := exec.Command("fzf", "--header", "Select AWS Region:")
+	cmd.Stdin = nil
+	output, err := cmd.Output()
+	if err != nil {
+		log.Fatalf("failed to run fzf: %v", err)
+	}
+	return string(output)
+}
 
-
-// package main
-
-// import (
-// 	"context"
-// 	"log"
-
-// 	"github.com/aws/aws-sdk-go-v2/aws"
-// 	"github.com/aws/aws-sdk-go-v2/config"
-// 	"github.com/aws/aws-sdk-go-v2/service/ec2" // Import the ec2 service
-// 	ec2Types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-// 	"github.com/triplemcoder14/ec2-connect/helpers"
-// )
-
-// func main() {
-// 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-west-2"))
-// 	if err != nil {
-// 		log.Fatalf("unable to load SDK config, %v", err)
-// 	}
-
-// 	svc := ec2.NewFromConfig(cfg)
-
-// 	filters := []ec2Types.Filter{
-// 		{
-// 			Name:   aws.String("instance-state-name"),
-// 			Values: []string{"running"},
-// 		},
-// 	}
-
-// 	input := &ec2.DescribeInstancesInput{
-// 		Filters: filters,
-// 	}
-
-// 	// cmd.Stdin = os.Stdin
-// 	// cmd.Stderr = os.Stderr
-// 	// cmd.Stdout = os.Stdout
-
-// 	result, err := svc.DescribeInstances(context.TODO(), input)
-// 	if err != nil {
-// 		log.Fatalf("failed to describe instances, %v", err)
-// 	}
-
-// 	for _, reservation := range result.Reservations {
-// 		for _, inst := range reservation.Instances {
-// 			if inst.InstanceId == nil {
-// 				continue
-// 			}
-// 			tagName := helpers.GetTagName(&inst)
-// 			log.Printf("Instance ID: %s, Name: %s", *inst.InstanceId, tagName)
-// 		}
-// 	}
-// }
+// Helper function to expand the home directory
+func expandHomeDir(path string) string {
+	if home := os.Getenv("HOME"); home != "" {
+		path = filepath.Join(home, path[2:]) // Strip off the ~ and join with home dir
+	}
+	return path
+}
