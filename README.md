@@ -9,7 +9,7 @@ A cmd tool that simplifies connecting to Amazon EC2 instances via SSH. It utiliz
 
   ### Build from Source
   
-To install the latest version of EC2-Connect, you can either download the precompiled [binaries](https://github.com/triplemcoder14/ec2-connect/releases/tag/v1.0.0)  or build it from source: run
+To install the latest version of ec2-connect, you can either download the precompiled [binaries](https://github.com/triplemcoder14/ec2-connect/releases/tag/v1.0.0)  or build it from source: run
 
 ```
  go install github.com/triplemcoder14/ec2-connect@latest
