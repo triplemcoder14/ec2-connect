@@ -28,7 +28,7 @@ ec2-connect [OPTIONS]
 
 - ``user``: The SSH user for login. The default is ``ubuntu``.
 - ``directory``: The directory where your SSH keys are stored. Default is ```~/.ssh```.
-- ``region``: The AWS region where your EC2 instances are located. Default is ``us-east-1``.
+- ``region``: The AWS region where your EC2 instances are located. Default is ``us-west-2``.
 
   ### Example Command
 
