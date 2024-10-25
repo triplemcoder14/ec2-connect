@@ -39,5 +39,5 @@ ec2-ssh [OPTIONS]
 
 ### License
 
-This tool is released under the MIT License. See the LICENSE file for more information.
+This tool is released under the MIT License. See the [LICENSE](https://github.com/triplemcoder14/ec2-connect/new/main) file for more information.
 
