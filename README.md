@@ -40,5 +40,5 @@ ec2-connect [OPTIONS]
 
 ### License
 
-This tool is released under the MIT License. See the [LICENSE](https://github.com/triplemcoder14/ec2-connect/blob/main/LICENSE) file for more information.
+This tool is released under the Apache License. See the [LICENSE](https://github.com/triplemcoder14/ec2-connect/blob/main/LICENSE) file for more information.
 
