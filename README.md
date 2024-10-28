@@ -17,7 +17,7 @@ To install the latest version of ec2-connect, you can either download the precom
 
 ### Usage
 
-#### Running the Tool
+### Running the Tool
 You can run the tool directly using:
 
 ```
@@ -61,7 +61,7 @@ If you run the tool without options, it will prompt you to:
 - Ensure Your Instance is Running: Check the AWS Management Console to verify that your EC2 instance is in a running state and has a public IP.
 - Run the Tool: Use the command with or without flags as described above.
 
-#### Troubleshooting
+### Troubleshooting
 
 - ``No Running Instances Found``: Ensure that your AWS account has running instances in the selected region.
 - ``SSH Key Issues``: Make sure your SSH private key is in the specified directory and has the correct permissions (e.g., chmod 400 ``/path/to/your/key.pem``)
