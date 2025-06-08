@@ -4,7 +4,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 )
 
-// StrOrDefault returns the value of the string pointer or a default value if it's nil.
 func StrOrDefault(s *string, defaultVal string) string {
 	if s == nil {
 		return defaultVal
@@ -12,7 +11,6 @@ func StrOrDefault(s *string, defaultVal string) string {
 	return *s
 }
 
-// GetTagName retrieves the "Name" tag of an EC2 instance.
 func GetTagName(inst *types.Instance) string {
 	var nameValue string
 	for _, t := range inst.Tags {
@@ -23,7 +21,6 @@ func GetTagName(inst *types.Instance) string {
 	return nameValue
 }
 
-// Contains checks if a slice contains a specific element.
 func Contains(slice []string, elem string) bool {
 	for _, v := range slice {
 		if v == elem {
