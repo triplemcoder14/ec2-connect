@@ -14,6 +14,15 @@ To install the latest version of ec2-connect, you can either download the precom
 ```
  go install github.com/triplemcoder14/ec2-connect@latest
 ```
+>Note: Go installs the binary to $HOME/go/bin by default.
+To make sure you can run ec2-connect from anywhere, add this to your shell config (e.g. ~/.zshrc or ~/.bashrc):
+```
+export PATH="$HOME/go/bin:$PATH"
+```
+Then reload your shell config:
+```
+source ~/.zshrc   # or source ~/.bashrc
+```
 
 ### Usage
 
